@@ -20,7 +20,20 @@ async function getRFIDs() {
   });
 }
 
+async function getAvailableRFIDs() {
+  return await prisma.rfidTag.findMany({
+    select: {
+      id: true,
+      uid: true
+    },
+    where: {
+      type: null
+    }
+  });
+}
+
 module.exports = {
   updateRFID,
-  getRFIDs
+  getRFIDs,
+  getAvailableRFIDs
 };
