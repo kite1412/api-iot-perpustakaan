@@ -1,4 +1,4 @@
-const { updateBookById, deleteBookById, getBookById, createBook } = require('../repositories/book.repository');
+const { updateBookById, deleteBookById, getBookById, createBook, getBooks } = require('../repositories/book.repository');
 const { updateRFID } = require('../repositories/rfid.repository');
 
 async function getBooksService(page, limit) {

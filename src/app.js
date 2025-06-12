@@ -8,11 +8,14 @@ const bookRoutes = require('./routes/book.route');
 const memberRoutes = require('./routes/member.route');
 const transactionRoutes = require('./routes/transaction.routes');
 const pengunjungRoutes = require('./routes/pengunjung.route');
+const rfidRoutes = require('./routes/rfid.route');
 require('./services/mqtt.service'); // Inisialisasi MQTT listener
 
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173"
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -21,6 +24,7 @@ app.use('/books', bookRoutes);
 app.use('/members', memberRoutes);
 app.use('/transactions', transactionRoutes);
 app.use('/pengunjung', pengunjungRoutes);
+app.use("/rfids", rfidRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
