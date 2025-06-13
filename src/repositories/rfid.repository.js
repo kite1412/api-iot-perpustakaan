@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function updateRFID(idRFID, rfidType) {
@@ -6,7 +6,7 @@ async function updateRFID(idRFID, rfidType) {
     where: { id: idRFID },
     data: {
       type: rfidType,
-      status: 'registered',
+      status: "registered",
     },
   });
 }
@@ -15,8 +15,8 @@ async function getRFIDs() {
   return await prisma.rfidTag.findMany({
     select: {
       id: true,
-      uid: true
-    }
+      uid: true,
+    },
   });
 }
 
@@ -24,16 +24,16 @@ async function getAvailableRFIDs() {
   return await prisma.rfidTag.findMany({
     select: {
       id: true,
-      uid: true
+      uid: true,
     },
     where: {
-      type: null
-    }
+      status: "unregistered",
+    },
   });
 }
 
 module.exports = {
   updateRFID,
   getRFIDs,
-  getAvailableRFIDs
+  getAvailableRFIDs,
 };

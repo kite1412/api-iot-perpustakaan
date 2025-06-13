@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function getBooks(page = 1, limit = 10) {
@@ -7,7 +7,7 @@ async function getBooks(page = 1, limit = 10) {
     skip,
     take: limit,
     orderBy: {
-      title: 'asc',
+      title: "asc",
     },
   });
 
@@ -33,16 +33,34 @@ async function updateBookById(id, data) {
   });
 }
 
-async function deleteBookById(id) {
-  return await prisma.book.delete({
-    where: { id: Number(id) },
-  });
+async function deleteBookById(id, rfidTagId) {
+  return await prisma.$transaction([
+    prisma.book.delete({
+      where: { id },
+    }),
+    prisma.rfidTag.update({
+      where: { id: rfidTagId },
+      data: {
+        status: "unregistered",
+        type: null,
+      },
+    }),
+  ]);
 }
 
-async function createBook(data) {
-  return await prisma.book.create({
-    data,
-  });
+async function createBook(data, rfidTagId) {
+  return await prisma.$transaction([
+    prisma.rfidTag.update({
+      where: { id: rfidTagId },
+      data: {
+        type: "book",
+        status: "registered",
+      },
+    }),
+    prisma.book.create({
+      data,
+    }),
+  ]);
 }
 
 module.exports = {

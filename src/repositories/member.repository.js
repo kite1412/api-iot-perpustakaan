@@ -1,4 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
 async function createMember(data) {
@@ -14,17 +14,17 @@ async function getMembers(filter = {}, pagination = {}) {
   const where = {};
 
   if (name) {
-    where.name = { contains: name, mode: 'insensitive' };
+    where.name = { contains: name, mode: "insensitive" };
   }
   if (memberId) {
-    where.memberId = { contains: memberId, mode: 'insensitive' };
+    where.memberId = { contains: memberId, mode: "insensitive" };
   }
 
   return await prisma.member.findMany({
     where,
     skip: offset,
     take: limit,
-    orderBy: { id: 'asc' },
+    orderBy: { id: "asc" },
     include: {
       rfidTag: true, // Jika ingin tampilkan data rfidTag juga
     },
@@ -47,10 +47,19 @@ async function updateMember(id, data) {
   });
 }
 
-async function deleteMember(id) {
-  return await prisma.member.delete({
-    where: { id },
-  });
+async function deleteMember(id, rfidTagId) {
+  return await prisma.$transaction([
+    prisma.member.delete({
+      where: { id },
+    }),
+    prisma.rfidTag.update({
+      where: { id: rfidTagId },
+      data: {
+        status: "unregistered",
+        type: null,
+      },
+    }),
+  ]);
 }
 
 module.exports = {

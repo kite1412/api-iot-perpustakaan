@@ -1,5 +1,11 @@
-const { createMember, getMembers, getMemberById, updateMember, deleteMember } = require('../repositories/member.repository');
-const { updateRFID } = require('../repositories/rfid.repository');
+const {
+  createMember,
+  getMembers,
+  getMemberById,
+  updateMember,
+  deleteMember,
+} = require("../repositories/member.repository");
+const { updateRFID } = require("../repositories/rfid.repository");
 
 async function createMemberService(memberData, idRFID, rfidType) {
   await updateRFID(idRFID, rfidType);
@@ -19,8 +25,8 @@ async function updateMemberService(id, data) {
   return await updateMember(id, data);
 }
 
-async function deleteMemberService(id) {
-  return await deleteMember(id);
+async function deleteMemberService(id, rfidTagId) {
+  return await deleteMember(id, rfidTagId);
 }
 
 module.exports = {
