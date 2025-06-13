@@ -1,7 +1,19 @@
-const { getBooksQuerySchema, getBookByIdParamsSchema, bookIdParamsSchema, bookUpdateBodySchema, bookCreateSchema } = require('../models/book.model');
-const { getBooksService, getBookByIdService, updateBookService, deleteBookService, createBookService } = require('../services/book.service');
-const { ValidationError } = require('../utils/errorHandler.mock');
-const { publishToEsp } = require('../services/mqtt.publisher.service');
+const {
+  getBooksQuerySchema,
+  getBookByIdParamsSchema,
+  bookIdParamsSchema,
+  bookUpdateBodySchema,
+  bookCreateSchema,
+} = require("../models/book.model");
+const {
+  getBooksService,
+  getBookByIdService,
+  updateBookService,
+  deleteBookService,
+  createBookService,
+} = require("../services/book.service");
+const { ValidationError } = require("../utils/errorHandler.mock");
+const { publishToEsp } = require("../services/mqtt.publisher.service");
 
 async function getBooksHandler(req, res) {
   try {
@@ -46,12 +58,18 @@ async function getBookByIdHandler(req, res) {
 async function updateBookHandler(req, res) {
   try {
     // Validasi id param
-    const { error: paramError, value: params } = bookIdParamsSchema.validate(req.params);
-    if (paramError) return res.status(400).json({ error: paramError.details[0].message });
+    const { error: paramError, value: params } = bookIdParamsSchema.validate(
+      req.params
+    );
+    if (paramError)
+      return res.status(400).json({ error: paramError.details[0].message });
 
     // Validasi body update
-    const { error: bodyError, value: body } = bookUpdateBodySchema.validate(req.body);
-    if (bodyError) return res.status(400).json({ error: bodyError.details[0].message });
+    const { error: bodyError, value: body } = bookUpdateBodySchema.validate(
+      req.body
+    );
+    if (bodyError)
+      return res.status(400).json({ error: bodyError.details[0].message });
 
     const updatedBook = await updateBookService(params.id, body);
     res.json(updatedBook);
@@ -64,8 +82,11 @@ async function updateBookHandler(req, res) {
 async function deleteBookHandler(req, res) {
   try {
     // Validasi id param
-    const { error: paramError, value: params } = bookIdParamsSchema.validate(req.params);
-    if (paramError) return res.status(400).json({ error: paramError.details[0].message });
+    const { error: paramError, value: params } = bookIdParamsSchema.validate(
+      req.params
+    );
+    if (paramError)
+      return res.status(400).json({ error: paramError.details[0].message });
 
     await deleteBookService(params.id);
     res.status(204).send(); // No content
@@ -83,15 +104,15 @@ async function createBookHandler(req, res) {
       return res.status(400).json({ error: error.details[0].message });
     }
 
-    const newBook = await createBookService(value, value.rfidTagId, 'book');
+    const newBook = await createBookService(value, value.rfidTagId);
 
-    publishToEsp('esp/receive', value.title);
+    publishToEsp("esp/receive", value.title);
 
     res.status(201).json(newBook);
   } catch (err) {
     // Jika error unique isbn, kembalikan error 409 conflict (optional)
-    if (err.code === 'P2002' && err.meta.target.includes('isbn')) {
-      return res.status(409).json({ error: 'ISBN already exists' });
+    if (err.code === "P2002" && err.meta.target.includes("isbn")) {
+      return res.status(409).json({ error: "ISBN already exists" });
     }
 
     res.status(500).json({ error: err.message });

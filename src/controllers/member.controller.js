@@ -1,12 +1,17 @@
-const { memberCreateSchema, getMembersQuerySchema, memberIdParamSchema, updateMemberSchema } = require('../models/member.model');
+const {
+  memberCreateSchema,
+  getMembersQuerySchema,
+  memberIdParamSchema,
+  updateMemberSchema,
+} = require("../models/member.model");
 const {
   createMemberService,
   getMembersService,
   getMemberByIdService,
   updateMemberService,
   deleteMemberService,
-} = require('../services/member.service');
-const { publishToEsp } = require('../services/mqtt.publisher.service');
+} = require("../services/member.service");
+const { publishToEsp } = require("../services/mqtt.publisher.service");
 
 async function createMemberHandler(req, res) {
   try {
@@ -15,15 +20,15 @@ async function createMemberHandler(req, res) {
       return res.status(400).json({ error: error.details[0].message });
     }
 
-    const newMember = await createMemberService(value, value.rfidTagId, 'member');
+    const newMember = await createMemberService(value, value.rfidTagId);
 
-    publishToEsp('esp/receive', value.name);
+    publishToEsp("esp/receive", value.name);
 
     res.status(201).json(newMember);
   } catch (err) {
     // Contoh handle error khusus jika ada (misal duplicate rfidTagId)
-    if (err.code === 'P2002' && err.meta.target.includes('rfidTagId')) {
-      return res.status(409).json({ error: 'RFID Tag ID already registered' });
+    if (err.code === "P2002" && err.meta.target.includes("rfidTagId")) {
+      return res.status(409).json({ error: "RFID Tag ID already registered" });
     }
     res.status(500).json({ error: err.message });
   }
@@ -65,7 +70,7 @@ async function getMemberByIdHandler(req, res) {
 
     const member = await getMemberByIdService(id);
     if (!member) {
-      return res.status(404).json({ error: 'Member not found' });
+      return res.status(404).json({ error: "Member not found" });
     }
     res.json(member);
   } catch (err) {
@@ -90,7 +95,7 @@ async function updateMemberHandler(req, res) {
     // Cek member dulu
     const existingMember = await getMemberByIdService(id);
     if (!existingMember) {
-      return res.status(404).json({ error: 'Member not found' });
+      return res.status(404).json({ error: "Member not found" });
     }
 
     const updatedMember = await updateMemberService(id, value);
@@ -112,10 +117,10 @@ async function deleteMemberHandler(req, res) {
     // Cek member dulu
     const existingMember = await getMemberByIdService(id);
     if (!existingMember) {
-      return res.status(404).json({ error: 'Member not found' });
+      return res.status(404).json({ error: "Member not found" });
     }
 
-    await deleteMemberService(id);
+    await deleteMemberService(id, existingMember.rfidTagId);
     res.status(204).send();
   } catch (err) {
     res.status(500).json({ error: err.message });

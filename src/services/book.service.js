@@ -1,5 +1,11 @@
-const { updateBookById, deleteBookById, getBookById, createBook, getBooks } = require('../repositories/book.repository');
-const { updateRFID } = require('../repositories/rfid.repository');
+const {
+  updateBookById,
+  deleteBookById,
+  getBookById,
+  createBook,
+  getBooks,
+} = require("../repositories/book.repository");
+const { updateRFID } = require("../repositories/rfid.repository");
 
 async function getBooksService(page, limit) {
   const data = await getBooks(page, limit);
@@ -9,7 +15,7 @@ async function getBooksService(page, limit) {
 async function getBookByIdService(id) {
   const book = await getBookById(id);
   if (!book) {
-    const error = new Error('Book not found');
+    const error = new Error("Book not found");
     error.statusCode = 404;
     throw error;
   }
@@ -20,7 +26,7 @@ async function updateBookService(id, data) {
   // Pastikan book ada dulu
   const book = await getBookById(id);
   if (!book) {
-    const error = new Error('Book not found');
+    const error = new Error("Book not found");
     error.statusCode = 404;
     throw error;
   }
@@ -32,18 +38,18 @@ async function deleteBookService(id) {
   // Pastikan book ada dulu
   const book = await getBookById(id);
   if (!book) {
-    const error = new Error('Book not found');
+    const error = new Error("Book not found");
     error.statusCode = 404;
     throw error;
   }
 
-  return await deleteBookById(id);
+  return await deleteBookById(id, book.rfidTagId);
 }
 
-async function createBookService(bookData, idRFID, rfidType) {
+async function createBookService(bookData, idRFID) {
   // Bisa tambah logic validasi bisnis (misalnya cek duplicate isbn) jika ingin
-  await updateRFID(idRFID, rfidType);
-  return await createBook(bookData);
+  // await updateRFID(idRFID, rfidType);
+  return await createBook(bookData, idRFID);
 }
 
 module.exports = {
