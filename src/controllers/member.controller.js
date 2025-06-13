@@ -20,11 +20,7 @@ async function createMemberHandler(req, res) {
       return res.status(400).json({ error: error.details[0].message });
     }
 
-    const newMember = await createMemberService(
-      value,
-      value.rfidTagId,
-      "member"
-    );
+    const newMember = await createMemberService(value, value.rfidTagId);
 
     publishToEsp("esp/receive", value.name);
 

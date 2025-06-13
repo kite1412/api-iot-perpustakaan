@@ -1,10 +1,19 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-async function createMember(data) {
-  return await prisma.member.create({
-    data,
-  });
+async function createMember(data, rfidTagId) {
+  return await prisma.$transaction([
+    prisma.rfidTag.update({
+      where: { id: rfidTagId },
+      data: {
+        type: "member",
+        status: "registered",
+      },
+    }),
+    prisma.member.create({
+      data,
+    }),
+  ]);
 }
 
 async function getMembers(filter = {}, pagination = {}) {

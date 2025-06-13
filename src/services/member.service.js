@@ -7,10 +7,10 @@ const {
 } = require("../repositories/member.repository");
 const { updateRFID } = require("../repositories/rfid.repository");
 
-async function createMemberService(memberData, idRFID, rfidType) {
-  await updateRFID(idRFID, rfidType);
+async function createMemberService(memberData, idRFID) {
+  // await updateRFID(idRFID, rfidType);
   // Bisa tambah logika validasi bisnis di sini jika perlu
-  return await createMember(memberData);
+  return await createMember(memberData, idRFID);
 }
 
 async function getMembersService(filter, pagination) {
