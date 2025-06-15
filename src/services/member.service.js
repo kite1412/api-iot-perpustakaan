@@ -1,10 +1,16 @@
-const { createMember, getMembers, getMemberById, updateMember, deleteMember } = require('../repositories/member.repository');
-const { updateRFID } = require('../repositories/rfid.repository');
+const {
+  createMember,
+  getMembers,
+  getMemberById,
+  updateMember,
+  deleteMember,
+} = require("../repositories/member.repository");
+const { updateRFID } = require("../repositories/rfid.repository");
 
-async function createMemberService(memberData, idRFID, rfidType) {
-  await updateRFID(idRFID, rfidType);
+async function createMemberService(memberData, idRFID) {
+  // await updateRFID(idRFID, rfidType);
   // Bisa tambah logika validasi bisnis di sini jika perlu
-  return await createMember(memberData);
+  return await createMember(memberData, idRFID);
 }
 
 async function getMembersService(filter, pagination) {
@@ -19,8 +25,8 @@ async function updateMemberService(id, data) {
   return await updateMember(id, data);
 }
 
-async function deleteMemberService(id) {
-  return await deleteMember(id);
+async function deleteMemberService(id, rfidTagId) {
+  return await deleteMember(id, rfidTagId);
 }
 
 module.exports = {
